@@ -9,7 +9,7 @@ import {
   selectOrderData
 } from '../../services/slices/constructor';
 import { selectIsAuthenticated } from '../../services/selectors';
-import { useAppDispatch, useAppSelector } from '../../services/store';
+import { useAppSelector, useAppDispatch } from '../../services/store';
 import { BurgerConstructorUI } from '../ui/burger-constructor';
 import { TIngredient, TOrder } from '@utils-types';
 

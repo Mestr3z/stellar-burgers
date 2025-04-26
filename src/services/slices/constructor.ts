@@ -1,11 +1,12 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { v4 as uuidv4 } from 'uuid';
 import { orderBurgerApi } from '@api';
 import { TIngredient, TOrder } from '@utils-types';
 import type { RootState } from '../store';
 
 interface ConstructorState {
   bun: TIngredient | null;
-  ingredients: TIngredient[];
+  ingredients: (TIngredient & { uniqueId: string })[];
   orderRequest: boolean;
   orderError?: string;
   orderData: TOrder | null;
@@ -40,42 +41,56 @@ const slice = createSlice({
   name: 'constructor',
   initialState,
   reducers: {
-    addBun(s, a: PayloadAction<TIngredient>) {
-      s.bun = a.payload;
+    addBun(state, action: PayloadAction<TIngredient>) {
+      state.bun = action.payload;
     },
-    addIngredient(s, a: PayloadAction<TIngredient>) {
-      s.ingredients.push(a.payload);
+    addIngredient: {
+      prepare(ingredient: TIngredient) {
+        return {
+          payload: {
+            ...ingredient,
+            uniqueId: uuidv4()
+          }
+        };
+      },
+      reducer(
+        state,
+        action: PayloadAction<TIngredient & { uniqueId: string }>
+      ) {
+        state.ingredients.push(action.payload);
+      }
     },
     moveIngredient(
-      s,
-      a: PayloadAction<{ fromIndex: number; toIndex: number }>
+      state,
+      action: PayloadAction<{ fromIndex: number; toIndex: number }>
     ) {
-      const [item] = s.ingredients.splice(a.payload.fromIndex, 1);
-      s.ingredients.splice(a.payload.toIndex, 0, item);
+      const [item] = state.ingredients.splice(action.payload.fromIndex, 1);
+      state.ingredients.splice(action.payload.toIndex, 0, item);
     },
-    removeIngredient(s, a: PayloadAction<number>) {
-      s.ingredients.splice(a.payload, 1);
+    removeIngredient(state, action: PayloadAction<number>) {
+      state.ingredients.splice(action.payload, 1);
     },
-    clearConstructor(s) {
-      s.bun = null;
-      s.ingredients = [];
-      s.orderData = null; 
+    clearConstructor(state) {
+      state.bun = null;
+      state.ingredients = [];
+      state.orderData = null;
     }
   },
-  extraReducers: (b) => {
-    b.addCase(orderBurger.pending, (s) => {
-      s.orderRequest = true;
-      s.orderError = undefined;
-    })
-      .addCase(orderBurger.fulfilled, (s, a) => {
-        s.orderRequest = false;
-        s.orderData = a.payload;
-        s.bun = null;
-        s.ingredients = [];
+  extraReducers: (builder) => {
+    builder
+      .addCase(orderBurger.pending, (state) => {
+        state.orderRequest = true;
+        state.orderError = undefined;
       })
-      .addCase(orderBurger.rejected, (s, a) => {
-        s.orderRequest = false;
-        s.orderError = a.payload;
+      .addCase(orderBurger.fulfilled, (state, action) => {
+        state.orderRequest = false;
+        state.orderData = action.payload;
+        state.bun = null;
+        state.ingredients = [];
+      })
+      .addCase(orderBurger.rejected, (state, action) => {
+        state.orderRequest = false;
+        state.orderError = action.payload;
       });
   }
 });
@@ -87,12 +102,12 @@ export const {
   removeIngredient,
   clearConstructor
 } = slice.actions;
-
 export default slice.reducer;
 
-export const selectBun = (s: RootState) => s.burgerConstructor.bun;
-export const selectConstructorIngredients = (s: RootState) =>
-  s.burgerConstructor.ingredients;
-export const selectOrderRequest = (s: RootState) =>
-  s.burgerConstructor.orderRequest;
-export const selectOrderData = (s: RootState) => s.burgerConstructor.orderData;
+export const selectBun = (state: RootState) => state.burgerConstructor.bun;
+export const selectConstructorIngredients = (state: RootState) =>
+  state.burgerConstructor.ingredients;
+export const selectOrderRequest = (state: RootState) =>
+  state.burgerConstructor.orderRequest;
+export const selectOrderData = (state: RootState) =>
+  state.burgerConstructor.orderData;

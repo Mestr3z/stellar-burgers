@@ -61,20 +61,21 @@ const slice = createSlice({
       s.error = a.payload;
     }
   },
-  extraReducers: (b) => {
-    b.addCase(fetchFeeds.pending, (s) => {
-      s.status = 'loading';
-      s.error = undefined;
-    })
-      .addCase(fetchFeeds.fulfilled, (s, a) => {
-        s.status = 'succeeded';
-        s.orders = a.payload.orders;
-        s.total = a.payload.total;
-        s.totalToday = a.payload.totalToday;
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchFeeds.pending, (s) => {
+        s.status = 'loading';
+        s.error = undefined;
       })
-      .addCase(fetchFeeds.rejected, (s, a) => {
+      .addCase(fetchFeeds.fulfilled, (s, action) => {
+        s.status = 'succeeded';
+        s.orders = action.payload.orders;
+        s.total = action.payload.total;
+        s.totalToday = action.payload.totalToday;
+      })
+      .addCase(fetchFeeds.rejected, (s, action) => {
         s.status = 'failed';
-        s.error = a.payload;
+        s.error = action.payload;
       });
   }
 });
@@ -82,9 +83,8 @@ const slice = createSlice({
 export const { wsConnect, wsDisconnect, wsMessage, wsError } = slice.actions;
 export default slice.reducer;
 
-export const selectFeedOrders = (s: RootState) => s.feed.orders;
-export const selectFeedStatus = (s: RootState) => s.feed.status;
-export const selectFeedError = (s: RootState) => s.feed.error;
-
-export const selectFeedTotal = (s: RootState) => s.feed.total;
-export const selectFeedTotalToday = (s: RootState) => s.feed.totalToday;
+export const selectFeedOrders = (state: RootState) => state.feed.orders;
+export const selectFeedStatus = (state: RootState) => state.feed.status;
+export const selectFeedError = (state: RootState) => state.feed.error;
+export const selectFeedTotal = (state: RootState) => state.feed.total;
+export const selectFeedTotalToday = (state: RootState) => state.feed.totalToday;

@@ -10,25 +10,28 @@ import {
   wsConnect as profileWsConnect,
   wsDisconnect as profileWsDisconnect
 } from '../../services/slices/profileOrders';
+import { selectIsAuthenticated } from '../../services/selectors';
 import { TOrder } from '@utils-types';
 
 export const ProfileOrders: FC = () => {
   const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(profileWsConnect());
-    return () => {
-      dispatch(profileWsDisconnect());
-    };
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(fetchProfileOrders());
-  }, [dispatch]);
+  const isAuth = useAppSelector(selectIsAuthenticated);
 
   const orders = useAppSelector(selectProfileOrders) || [];
   const status = useAppSelector(selectProfileOrdersStatus);
   const error = useAppSelector(selectProfileOrdersError);
+
+  useEffect(() => {
+    if (!isAuth) {
+      return;
+    }
+    dispatch(profileWsConnect());
+    dispatch(fetchProfileOrders());
+
+    return () => {
+      dispatch(profileWsDisconnect());
+    };
+  }, [isAuth, dispatch]);
 
   if (status === 'loading') {
     return <Preloader />;
@@ -42,7 +45,8 @@ export const ProfileOrders: FC = () => {
   }
 
   const sorted = [...orders].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    (a: TOrder, b: TOrder) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
   return <ProfileOrdersUI orders={sorted} />;

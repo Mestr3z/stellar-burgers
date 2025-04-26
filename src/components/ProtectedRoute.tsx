@@ -1,7 +1,8 @@
-import { FC, ReactElement } from 'react';
+import React, { FC, ReactElement } from 'react';
 import { useLocation, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { selectIsAuthenticated } from '../services/selectors';
+import { useAppSelector } from '../services/store';
+import { selectIsAuthenticated, selectAuthStatus } from '../services/selectors';
+import { Preloader } from '@ui';
 
 interface IProtectedRouteProps {
   onlyGuest?: boolean;
@@ -14,8 +15,17 @@ export const ProtectedRoute: FC<IProtectedRouteProps> = ({
   onlyAuth = false,
   children
 }) => {
-  const isAuth = useSelector(selectIsAuthenticated);
+  const isAuth = useAppSelector(selectIsAuthenticated);
+  const authStatus = useAppSelector(selectAuthStatus);
   const location = useLocation();
+
+  if (authStatus === 'loading') {
+    return <Preloader />;
+  }
+
+  if (onlyAuth && authStatus === 'idle') {
+    return <Preloader />;
+  }
 
   if (onlyGuest && isAuth) {
     return <Navigate to='/' replace />;

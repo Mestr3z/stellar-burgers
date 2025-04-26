@@ -6,7 +6,9 @@ import {
   fetchFeeds,
   selectFeedOrders,
   selectFeedStatus,
-  selectFeedError
+  selectFeedError,
+  wsConnect,
+  wsDisconnect
 } from '../../services/slices/feed';
 import { TOrder } from '@utils-types';
 
@@ -17,8 +19,17 @@ export const Feed: FC = () => {
   const error = useAppSelector(selectFeedError);
 
   useEffect(() => {
-    if (status === 'idle') dispatch(fetchFeeds());
+    if (status === 'idle') {
+      dispatch(fetchFeeds());
+    }
   }, [status, dispatch]);
+
+  useEffect(() => {
+    dispatch(wsConnect());
+    return () => {
+      dispatch(wsDisconnect());
+    };
+  }, [dispatch]);
 
   if (status === 'loading') return <Preloader />;
   if (status === 'failed') return <p>Ошибка загрузки ленты: {error}</p>;
