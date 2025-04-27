@@ -1,7 +1,16 @@
 .items {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 32px 40px;
   margin: 0;
   padding: 0;
+  list-style: none;
+}
+
+
+
+.link {
+  display: block;       
+  text-decoration: none;
+  color: inherit;       
 }

@@ -41,10 +41,10 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = ({
         constructorItems.ingredients.map(
           (item: TConstructorIngredient, index: number) => (
             <BurgerConstructorElement
+              key={item.uniqueId}
               ingredient={item}
               index={index}
               totalItems={constructorItems.ingredients.length}
-              key={item.id}
             />
           )
         )

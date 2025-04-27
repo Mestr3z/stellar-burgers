@@ -1,5 +1,5 @@
+import React, { forwardRef } from 'react';
 import styles from './ingredients-category.module.css';
-import { forwardRef } from 'react';
 import { TIngredientsCategoryUIProps } from './type';
 import { BurgerIngredient } from '@components';
 
@@ -14,9 +14,9 @@ export const IngredientsCategoryUI = forwardRef<
     <ul className={styles.items} ref={ref}>
       {ingredients.map((ingredient) => (
         <BurgerIngredient
-          ingredient={ingredient}
           key={ingredient._id}
-          count={ingredientsCounters[ingredient._id]}
+          ingredient={ingredient}
+          count={ingredientsCounters[ingredient._id] || 0}
         />
       ))}
     </ul>
