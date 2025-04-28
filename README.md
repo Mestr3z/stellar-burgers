@@ -1,6 +1,6 @@
 # Stellar Burger
-
-Репозиторий вашего приложения «Stellar Burger» — модульный React + TypeScript проект с Redux Toolkit, React Router, Cypress и Jest.
+[Link to the pages]()
+Репозиторий приложения «Stellar Burger» — модульный React + TypeScript проект с Redux Toolkit, React Router, Cypress и Jest.
 
 ---
 
