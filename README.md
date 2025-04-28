@@ -1,19 +1,94 @@
-# Проектная работа 11-го спринта
+# Stellar Burger
 
-[Макет](<https://www.figma.com/file/vIywAvqfkOIRWGOkfOnReY/React-Fullstack_-Проектные-задачи-(3-месяца)_external_link?type=design&node-id=0-1&mode=design>)
+Репозиторий вашего приложения «Stellar Burger» — модульный React + TypeScript проект с Redux Toolkit, React Router, Cypress и Jest.
 
-[Чеклист](https://www.notion.so/praktikum/0527c10b723d4873aa75686bad54b32e?pvs=4)
+---
 
-## Этапы работы:
+## Содержание
 
-1. Разверните проект и ознакомьтесь с кодом. Все необходимые вам компоненты уже созданы и лежат в папке `src/components`
+1. [Описание проекта](#описание-проекта)  
+2. [Реализованные фичи](#реализованные-фичи)  
+   - Первый спринт (роутинг, авторизация, профиль, лента, история)  
+   - Второй спринт (E2E-тесты, unit-тесты)  
+3. [Установка и запуск](#установка-и-запуск)  
+4. [Тестирование](#тестирование)  
+   - Cypress  
+   - Jest  
+5. [Структура репозитория](#структура-репозитория)  
+6. [Чек-лист выполненных требований](#чек-лист-выполненных-требований)  
 
-2. Настройте роутинг.
+---
 
-3. Напишите функционал запросов данных с сервера, используя `Redux` и глобальный `store`. Сами "ручки" уже прописаны и лежат в `utils/burger-api.ts`
+## Описание проекта
 
-4. Настройте авторизацию и создайте защищённые роуты.
+«Stellar Burger» — SPA-приложение для заказа «космических» бургеров:
 
-## Важно:
+- **Конструктор**: выбираете булку, соусы и начинки, смотрите итоговую цену.
+- **Лента заказов**: глобальная лента всех заказов в реальном времени через WebSocket.
+- **Профиль & история**: личный кабинет с редактированием данных и историей собственных заказов (также через WebSocket).
+- **Авторизация & регистрация**: защищённые маршруты, токены хранятся в cookie & localStorage.
 
-Для корректной работы запросов к серверу необходимо добавить переменную BURGER_API_URL в окружение. Сама ссылка находится в файле `.env.example`.
+---
+
+## Реализованные фичи
+
+### Первый спринт
+
+- **Routing**  
+  – React Router v6: настроены все маршруты `/`, `/feed`, `/login`, `/register`, `/forgot-password`, `/reset-password`, `/profile`, `/profile/orders`, а также динамические модалки `/ingredients/:id`, `/feed/:id`, `/profile/orders/:id` через `location.state`.  
+- **ProtectedRoute**  
+  – неавторизованные пользователи перенаправляются на `/login` при попытке открыть защищённые страницы; авторизованные — не могут попасть на `/login`, `/register`, `/forgot-password`, `/reset-password`.  
+- **Редактирование профиля**  
+  – форма с предзаполненными данными, кнопки **Сохранить**/**Отменить** появляются только при изменениях, запросы на `PATCH /auth/user`.  
+- **Лента заказов**  
+  – `/feed` доступен всем, WebSocket-соединение к `wss://…/orders` + подсчёт стоимости и отображение `total`/`totalToday`.  
+- **История заказов**  
+  – `/profile/orders` для авторизованных, WebSocket к `wss://…/orders?token=…`, отображение статусов (`created`, `pending`, `done`).  
+- **Модалки**  
+  – детали ингредиента и заказа через `Modal` + портал в `#modals`, закрытие кнопкой и по клавише Esc.  
+- **UX**  
+  – прелоадеры при загрузке данных, обработка ошибок.
+
+### Второй спринт
+
+- **Cypress E2E-тесты** (`cypress/e2e/constructor.cy.tsx`)  
+  - моковые fixtures (`ingredients.json`, `user.json`, `orderResponse.json`)  
+  - `cy.intercept` для `GET /api/ingredients`, `POST /api/orders`, `GET /api/auth/user`  
+  - тесты: добавление булок и начинок в конструктор, открытие/закрытие модалок (крестик, оверлей), оформление заказа, очистка конструктора  
+- **Jest unit-тесты** (`src/services/slices/__tests__/*`)  
+  - `rootReducer` smoke-test  
+  - `constructor` slice: add/remove/move + pending/fulfilled/rejected для `orderBurger`  
+  - `ingredients` slice: pending/fulfilled/rejected для `fetchIngredients`  
+  - `auth`, `feed`, `profileOrders` slices: покрытие всех стадий async-thunk + sync-actions
+
+---
+
+## Установка и запуск
+
+```bash
+# клонировать репозиторий
+git clone https://github.com/<ваш-логин>/stellar-burger.git
+cd stellar-burger
+
+# установить зависимости
+npm install
+
+# старт dev-сервера
+npm start
+
+```
+
+## Тестирование
+
+```bash
+# запустить все E2E-тесты
+npx cypress run
+
+# открыть GUI
+npx cypress open
+
+# запустить unit-тесты и собрать coverage
+npm run test
+
+# запустить в режиме watch
+npm run test:watch
