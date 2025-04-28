@@ -65,7 +65,7 @@
 
 ```bash
 # клонировать репозиторий
-git clone https://github.com/<ваш-логин>/stellar-burger.git
+git clone https://github.com/mestr3z/stellar-burger.git
 cd stellar-burger
 
 # установить зависимости
