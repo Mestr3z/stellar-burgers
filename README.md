@@ -1,5 +1,6 @@
 # Stellar Burger
-[Link to the pages](https://mestr3z.github.io/stellar-burgers/)
+-[Link to the pages](https://mestr3z.github.io/stellar-burgers/)
+
 Репозиторий приложения «Stellar Burger» — модульный React + TypeScript проект с Redux Toolkit, React Router, Cypress и Jest.
 
 ---
